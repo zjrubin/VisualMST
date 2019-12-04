@@ -5,7 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 def main():
-    input_file = './sample1/sample1_out.txt'
+    input_file = './sample2/sample2_out.txt'
 
     with open(input_file, 'r') as infile:
         num_verticies = int(infile.readline())
@@ -51,4 +51,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
