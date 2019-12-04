@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3d_prims_algorithm", "3d_prims_algorithm.vcxproj", "{3E837353-CF7D-4DE2-8337-65CC1EB0E55D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3E837353-CF7D-4DE2-8337-65CC1EB0E55D}.Debug|x64.ActiveCfg = Debug|x64
+		{3E837353-CF7D-4DE2-8337-65CC1EB0E55D}.Debug|x64.Build.0 = Debug|x64
+		{3E837353-CF7D-4DE2-8337-65CC1EB0E55D}.Debug|x86.ActiveCfg = Debug|Win32
+		{3E837353-CF7D-4DE2-8337-65CC1EB0E55D}.Debug|x86.Build.0 = Debug|Win32
+		{3E837353-CF7D-4DE2-8337-65CC1EB0E55D}.Release|x64.ActiveCfg = Release|x64
+		{3E837353-CF7D-4DE2-8337-65CC1EB0E55D}.Release|x64.Build.0 = Release|x64
+		{3E837353-CF7D-4DE2-8337-65CC1EB0E55D}.Release|x86.ActiveCfg = Release|Win32
+		{3E837353-CF7D-4DE2-8337-65CC1EB0E55D}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {14639D19-3EEE-46B0-9371-D947C02C41EC}
+	EndGlobalSection
+EndGlobal
