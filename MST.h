@@ -8,6 +8,16 @@ class MST
 public:
 	MST(std::istream& is);
 
+	/*
+	Outputs an MST in save-format:
+	- number of vertices
+	- coordinates for each vertex
+	- \n
+	- total_edge_weight of the MST
+	- connections between vertices that form an MST
+	*/
+	void save(std::ostream& os);
+
 	double get_total_edge_weight() const
 	{ return total_edge_weight; }
 

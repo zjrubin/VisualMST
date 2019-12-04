@@ -1,17 +1,15 @@
 #include "MST.h"
-#include <iostream>
 #include <fstream>
 
-using std::cout; using std::endl;
-
-using namespace std;
+using std::ifstream; using std::ofstream;
 
 int main()
 {
-	cout << "Hello world" << endl;
+	ifstream infile{ "./sample1/sample1_in.txt" };
+	MST m{ infile };
 
-	ifstream infile{ "./sample1/points_in.txt" };
-	MST{ infile };
+	ofstream outfile{ "./sample1/sample1_out.txt" };
+	m.save(outfile);
 
 	return 0;
 }

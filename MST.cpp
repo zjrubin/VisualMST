@@ -6,12 +6,20 @@
 #include <utility>
 #include <vector>
 
-using std::istream;
+using std::endl;
+using std::istream; using std::ostream;
 using std::map;
 using std::numeric_limits;
 using std::pair;
-//using std::priority_queue;
 using std::vector;
+
+constexpr int invalid_node_number_c = numeric_limits<int>::lowest();
+
+struct Vertex_Attributes
+{
+	double cost;
+	int previous;
+};
 
 MST::MST(istream& is)
 	: total_edge_weight{ 0 }
@@ -38,12 +46,11 @@ MST::MST(istream& is)
 		}
 	}
 
-
-	map<int, pair<double, int>> costs; // Map from: vertex number -> {cost, previous vertex}s
+	map<int, Vertex_Attributes> costs; // Map from: vertex number -> {cost, previous vertex}s
 	for (size_t i = 0; i < verticies.size(); ++i)
-		costs[i] = pair{ std::numeric_limits<double>::infinity(), std::numeric_limits<int>::lowest() };
+		costs[i] = { std::numeric_limits<double>::infinity(), invalid_node_number_c };
 
-	costs[0] = { 0, std::numeric_limits<int>::lowest() }; // Starting vertex has no cost and no previous vertex
+	costs[0] = { 0, invalid_node_number_c }; // Starting vertex has no cost and no previous vertex
 	
 	int min_cost_vertex_num = 0; // Vertex 0 is the starting vertex
 	while (!costs.empty())
@@ -62,10 +69,10 @@ MST::MST(istream& is)
 			if (iter != costs.end())
 			{
 				double edge_weight = edge_weights[min_cost_vertex_num][i];
-				if (edge_weight < iter->second.first)
+				if (edge_weight < iter->second.cost)
 				{
-					iter->second.first = edge_weight; // set cost
-					iter->second.second = min_cost_vertex_num; // set previous
+					iter->second.cost = edge_weight;
+					iter->second.previous = min_cost_vertex_num;
 				}
 
 				if (edge_weight < min_edge_weight)
@@ -78,11 +85,26 @@ MST::MST(istream& is)
 
 		min_cost_vertex_num = next_min_cost_vertex_num;
 	}
+
+	// Remove the invalid starting node
+	edges.erase(invalid_node_number_c);
 }
+
+void MST::save(ostream& os)
+{
+	os << verticies.size() << endl;
+	for (const auto& pair : verticies)
+		os << pair.second.x << " " << pair.second.y << " " << pair.second.z << endl;
+
+	os << endl;
+
+	os << total_edge_weight << endl;
+
+	for (auto iter = edges.begin(); iter != edges.end(); ++iter)
+		os << iter->first << " " << iter->second << endl;
+ }
 
 double MST::cartesian_distance(const Vertex& v1, const Vertex& v2) const
 {
 	return sqrt(pow(v2.x - v1.x, 2) + pow(v2.y - v1.y, 2) + pow(v2.z- v1.z, 2));
 }
-
-
