@@ -5,7 +5,6 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 def main():
-    
     input_file = './sample1/sample1_out.txt'
 
     with open(input_file, 'r') as infile:
@@ -19,24 +18,10 @@ def main():
             y.append(float(y_))
             z.append(float(z_))
 
-        # print('x: ', x)
-        # print('y: ', y)
-        # print('z: ', z)
-
-        # verticies = dict()
-        # for i in range(num_verticies):
-        #     x, y, z = infile.readline().split()
-        #     verticies[i] = {
-        #         'x': float(x),
-        #         'y': float(y),
-        #         'z': float(z)
-        #     }
-        # print(verticies)
-
-        infile.readline() # read in extra \n
+        infile.readline()  # read in extra \n
 
         # Read in total edge weight
-        total_edge_weight  = float(infile.readline())
+        total_edge_weight = float(infile.readline())
         print('total edge weight: ', total_edge_weight)
 
         # Read in edges
@@ -45,10 +30,9 @@ def main():
             v1, v2 = line.split()
             v1, v2 = int(v1), int(v2)
             edges[v1].append(v2)
-        # print(edges)
 
     # Create the graph
-    fig = plt.figure(figsize=(20,10))
+    plt.figure(figsize=(20,10))
     ax = plt.axes(projection='3d')
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
@@ -61,12 +45,10 @@ def main():
     for v1, v2s in edges.items():
         for v2 in v2s:
             ax.plot([x[v1], x[v2]], [y[v1], y[v2]], [z[v1], z[v2]], color='blue')
-        # print(v1)
-        # print(v2s)
 
     plt.show()
 
-            
 
 if __name__ == '__main__':
     main()
+    

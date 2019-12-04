@@ -1,0 +1,6 @@
+{
+    "python.linting.enabled": true,
+    "python.linting.pycodestyleArgs": ["--ignore=E501"],
+    "python.linting.pydocstyleEnabled": false,
+    "python.pythonPath": "C:\\Users\\Zach\\Anaconda3\\python.exe",
+}
