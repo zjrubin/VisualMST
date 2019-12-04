@@ -54,7 +54,7 @@ def read_edges(infile: TextIO) -> defaultdict(list):
 
 def create_graph(x: list, y: list, z: list, edges: defaultdict) -> None:
     # Create the figure
-    plt.figure(figsize=(20,10))
+    plt.figure(figsize=(20, 10))
     ax = plt.axes(projection='3d')
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
