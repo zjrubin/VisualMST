@@ -1,4 +1,4 @@
-#include "MST.h"
+#include "Prims_MST.h"
 #include "Utility.h"
 #include <exception>
 #include <fstream>
@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 		if (!outfile.is_open())
 			throw Error{ "Could not open oufile!" };
 
-		MST m{ infile };
+		Prims_MST m{ infile };
 		m.save(outfile);
 	}
 	catch (Error & e)
