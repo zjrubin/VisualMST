@@ -1,33 +1,66 @@
+#include "getopt.h"
 #include "Prims_MST.h"
 #include "Utility.h"
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <memory>
+#include <string>
 
 using std::cout; using std::endl;
 using std::exception;
 using std::ifstream; using std::ofstream;
+using std::string;
+using std::unique_ptr; using std::make_unique;
+
+void run(const string& infile_name, const string& outfile_name, const string& algorithm);
+unique_ptr<MST> create_MST(ifstream& infile, const string& algorithm);
 
 int main(int argc, char* argv[])
 {
-	if (argc != 3)
-	{
-		cout << "usage: mst <infile> <outfile>" << endl;
-		return 1;
-	}
-
 	try
 	{
-		ifstream infile{ argv[1] };
-		if (!infile.is_open())
-			throw Error{ "Could not open infile!" };
+		int option_index = 0;
+		int option = 0;
 
-		ofstream outfile{ argv[2] };
-		if (!outfile.is_open())
-			throw Error{ "Could not open oufile!" };
+		// use getopt to find command line options
+		struct option longOpts[] = {
+			{"infile", required_argument, nullptr, 'i'},
+			{"outfile", required_argument, nullptr, 'o'},
+			{ "mode", required_argument, nullptr, 'm' },
+			{ "help", no_argument, nullptr, 'h' },
+			{ nullptr, 0, nullptr, '\0' }
+		};
 
-		Prims_MST m{ infile };
-		m.save(outfile);
+		string algorithm, infile, outfile;
+		bool i_seen = false, o_seen = false, m_seen = false;
+		while ((option = getopt_long(argc, argv, "i:o:m:h", longOpts, &option_index)) != -1)
+		{
+			switch (option)
+			{
+			case 'i':
+				i_seen = true;
+				infile = optarg;
+				break;
+			case 'o':
+				o_seen = true;
+				outfile = optarg;
+				break;
+			case 'm':
+				m_seen = true;
+				algorithm = optarg;
+				break;
+			case 'h':
+			default:
+				throw Error{ "Usage: " + string{argv[0]} +" -m <prims|kruskals> -i <infile> -o <outfile>" };
+				break;
+			}
+		}
+
+		if (!i_seen || !o_seen || !m_seen) // Make sure all required options have been seen
+			throw Error{ "Usage: " + string{argv[0]} +" -m <prims|kruskals> -i <infile> -o <outfile>" };
+
+		run(infile, outfile, algorithm);
 	}
 	catch (Error & e)
 	{
@@ -46,4 +79,28 @@ int main(int argc, char* argv[])
 	}
 
 	return 0;
+}
+
+void run(const string& infile_name, const string& outfile_name, const string& algorithm)
+{
+	ifstream infile{ infile_name };
+	if (!infile.is_open())
+		throw Error{ "Could not open infile!" };
+
+	ofstream outfile{ outfile_name };
+	if (!outfile.is_open())
+		throw Error{ "Could not open oufile!" };
+
+	unique_ptr<MST> mst_ptr = create_MST(infile, algorithm);
+	mst_ptr->save(outfile);
+}
+
+unique_ptr<MST> create_MST(ifstream& infile, const string& algorithm)
+{
+	if (algorithm == "prims")
+		return make_unique<Prims_MST>(infile);
+	else if (algorithm == "kruskals")
+		throw Error{ "Kruskal's algorithm has not been implemented yet!" };
+	else
+		throw Error{ "Invalid algorithm choice!\nValid options are: prims|kruskals" };
 }
