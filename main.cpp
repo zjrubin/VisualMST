@@ -52,13 +52,13 @@ int main(int argc, char* argv[])
 				break;
 			case 'h':
 			default:
-				throw Error{ "Usage: " + string{argv[0]} +" -m <prims|kruskals> -i <infile> -o <outfile>" };
+				throw Error{ "Usage: " + string{argv[0]} + " -m <prims|kruskals> -i <infile> -o <outfile>" };
 				break;
 			}
 		}
 
 		if (!i_seen || !o_seen || !m_seen) // Make sure all required options have been seen
-			throw Error{ "Usage: " + string{argv[0]} +" -m <prims|kruskals> -i <infile> -o <outfile>" };
+			throw Error{ "Usage: " + string{argv[0]} + " -m <prims|kruskals> -i <infile> -o <outfile>" };
 
 		run(infile, outfile, algorithm);
 	}
@@ -87,11 +87,12 @@ void run(const string& infile_name, const string& outfile_name, const string& al
 	if (!infile.is_open())
 		throw Error{ "Could not open infile!" };
 
+	unique_ptr<MST> mst_ptr = create_MST(infile, algorithm);
+
 	ofstream outfile{ outfile_name };
 	if (!outfile.is_open())
 		throw Error{ "Could not open oufile!" };
 
-	unique_ptr<MST> mst_ptr = create_MST(infile, algorithm);
 	mst_ptr->save(outfile);
 }
 

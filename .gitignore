@@ -342,3 +342,5 @@ healthchecksdb
 *.o
 mst
 env
+VisualMST.egg-info/
+/sample4
