@@ -138,6 +138,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="getopt.c" />
+    <ClCompile Include="Kruskals_MST.cpp" />
+    <ClCompile Include="Kruskals_MST.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MST.cpp" />
     <ClCompile Include="Prims_MST.cpp" />

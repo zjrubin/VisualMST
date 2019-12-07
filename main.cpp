@@ -1,4 +1,5 @@
 #include "getopt.h"
+#include "Kruskals_MST.h"
 #include "Prims_MST.h"
 #include "Utility.h"
 #include <exception>
@@ -101,7 +102,7 @@ unique_ptr<MST> create_MST(ifstream& infile, const string& algorithm)
 	if (algorithm == "prims")
 		return make_unique<Prims_MST>(infile);
 	else if (algorithm == "kruskals")
-		throw Error{ "Kruskal's algorithm has not been implemented yet!" };
+		return make_unique<Kruskals_MST>(infile);
 	else
 		throw Error{ "Invalid algorithm choice!\nValid options are: prims|kruskals" };
 }

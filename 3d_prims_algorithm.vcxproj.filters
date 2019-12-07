@@ -41,5 +41,11 @@
     <ClCompile Include="getopt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Kruskals_MST.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Kruskals_MST.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
