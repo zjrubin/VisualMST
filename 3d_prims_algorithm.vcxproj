@@ -132,6 +132,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="getopt.h" />
+    <ClInclude Include="Kruskals_MST.h" />
     <ClInclude Include="MST.h" />
     <ClInclude Include="Prims_MST.h" />
     <ClInclude Include="Utility.h" />
@@ -139,7 +140,6 @@
   <ItemGroup>
     <ClCompile Include="getopt.c" />
     <ClCompile Include="Kruskals_MST.cpp" />
-    <ClCompile Include="Kruskals_MST.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MST.cpp" />
     <ClCompile Include="Prims_MST.cpp" />

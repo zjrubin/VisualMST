@@ -27,6 +27,9 @@
     <ClInclude Include="getopt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Kruskals_MST.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MST.cpp">
@@ -40,9 +43,6 @@
     </ClCompile>
     <ClCompile Include="getopt.c">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Kruskals_MST.h">
-      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="Kruskals_MST.cpp">
       <Filter>Source Files</Filter>

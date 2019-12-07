@@ -1,13 +1,10 @@
 #include "Prims_MST.h"
-#include <istream>
 #include <limits>
-#include <iostream>
 #include <queue>
 #include <utility>
 #include <vector>
 
-using std::endl;
-using std::istream; using std::ostream;
+using std::istream;
 using std::map;
 using std::numeric_limits;
 using std::pair;
@@ -22,16 +19,8 @@ struct Vertex_Attributes
 };
 
 Prims_MST::Prims_MST(istream& is)
-	: MST{}, total_edge_weight { 0 }
+	: MST{is}
 {
-	// Read in verticies
-	int vertex_number = 0;
-	double x, y, z;
-	while (is >> x >> y >> z)
-	{
-		verticies[vertex_number++] = Vertex{ x,y,z };
-	}
-
 	// Create edge weight adjacency matrix
 	vector<vector<double>> edge_weights(verticies.size(), vector<double>(verticies.size(), numeric_limits<double>::infinity()));
 	for (size_t i = 0; i < verticies.size(); ++i)
@@ -88,18 +77,4 @@ Prims_MST::Prims_MST(istream& is)
 
 	// Remove the invalid starting node
 	edges.erase(invalid_node_number_c);
-}
-
-void Prims_MST::save(ostream& os) const
-{
-	os << verticies.size() << endl;
-	for (const auto& pair : verticies)
-		os << pair.second.x << " " << pair.second.y << " " << pair.second.z << endl;
-
-	os << endl;
-
-	os << total_edge_weight << endl;
-
-	for (auto iter = edges.begin(); iter != edges.end(); ++iter)
-		os << iter->first << " " << iter->second << endl;
 }

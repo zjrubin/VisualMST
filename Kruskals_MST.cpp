@@ -1,18 +1,20 @@
 #include "Kruskals_MST.h"
-#include <iostream>
 #include <queue>
+#include <numeric>
 #include <utility>
 #include <vector>
 
+using std::iota;
 using std::istream;
-using namespace std;
+using std::priority_queue;
+using std::vector;
 
 using membership_containter_t = vector<int>;
 
 static int find_set(const membership_containter_t& memberships, int vertex_index);
 static void set_union(membership_containter_t& memberships, int vertex1, int vertex2);
 
-struct Kruskals_MST::Edge
+struct Edge
 {
 	double distance;
 	size_t vertex1_index;
@@ -20,20 +22,10 @@ struct Kruskals_MST::Edge
 };
 
 Kruskals_MST::Kruskals_MST(istream& is)
-	: MST{}, total_edge_weight{ 0 }
+	: MST{is}
 {
-	// Read in verticies
-	int vertex_number = 0;
-	double x, y, z;
-	vector<int> memberships;
-	while (is >> x >> y >> z)
-	{
-		verticies[vertex_number] = Vertex{ x,y,z };
-		memberships.push_back(vertex_number);
-		++vertex_number;
-	}
-
-	using Edge_t = Kruskals_MST::Edge;
+	// Create a list of all possible edges
+	using Edge_t = Edge;
 	vector<Edge_t> all_edges;
 	all_edges.reserve(verticies.size()*(verticies.size() - 1) / 2); // Enough capacity for number of edges of a fully connected graph
 	for (size_t i = 0; i < verticies.size() - 1; ++i)
@@ -44,9 +36,13 @@ Kruskals_MST::Kruskals_MST(istream& is)
 		}
 	}
 
+	// Apply Kruskal's Algorithm
 	auto comp = [](const Edge_t& lhs, const Edge_t& rhs) {return lhs.distance > rhs.distance; }; // for min priority_queue
 	using Edge_container_t = priority_queue<Edge_t, vector<Edge_t>, decltype(comp)>;
 	Edge_container_t edge_queue(comp, move(all_edges)); // Priority queue of all edges
+
+	vector<int> memberships(verticies.size());
+	iota(memberships.begin(), memberships.end(), 0); // Mapping of vertex -> set it belongs to
 
 	while (!edge_queue.empty())
 	{
@@ -60,20 +56,6 @@ Kruskals_MST::Kruskals_MST(istream& is)
 			set_union(memberships, edge.vertex1_index, edge.vertex2_index);
 		}
 	}
-}
-
-void Kruskals_MST::save(ostream& os) const
-{
-	os << verticies.size() << endl;
-	for (const auto& pair : verticies)
-		os << pair.second.x << " " << pair.second.y << " " << pair.second.z << endl;
-
-	os << endl;
-
-	os << total_edge_weight << endl;
-
-	for (auto iter = edges.begin(); iter != edges.end(); ++iter)
-		os << iter->first << " " << iter->second << endl;
 }
 
 static int find_set(const membership_containter_t& memberships, int vertex_index)
