@@ -47,5 +47,8 @@
     <ClCompile Include="Kruskals_MST.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TSP_main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
