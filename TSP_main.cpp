@@ -36,7 +36,7 @@ struct Path
     Set_t previous_vertices;
 };
 
-struct Comp
+struct Comp_Path
 {
     using is_transparent = std::true_type;
     bool operator() (const Path& lhs, const Path& rhs) const
@@ -56,17 +56,20 @@ struct Comp
         }
 
         //assert(!"This point shold not be reached");
-        return false; // lhs not < rhs
+        return false; // lhs !< rhs
     }
 };
 
-using Paths_container_t = map<Path, double, Comp>;
+using Paths_container_t = map<Path, double, Comp_Path>;
+
+constexpr int num_edges_c = 4;
 
 Power_Set_t generate_power_set(int n);
+void find_distance(Paths_container_t& paths, double edge_weights[][num_edges_c], int vertex_to, const Set_t& previous_verticies);
+ostream& operator << (ostream& os, const Power_Set_t& powerset);
 
 int main()
 {
-    const int num_edges_c = 4;
     // Edge weights from https://www.youtube.com/watch?v=-JjA4BLQyqE
     double edge_weights[][num_edges_c] = {
         { 0,  2,  9, 10},
@@ -74,7 +77,6 @@ int main()
         {15,  7,  0,  8},
         { 6,  3, 12,  0}
     };
-
 
     Paths_container_t paths;
 
@@ -86,61 +88,30 @@ int main()
         // calculate distance back to starting vertex
         if (iter->size() == num_edges_c - 1)
         {
-            Path p = { 0, *iter };
-            double min_distance = numeric_limits<double>::infinity();
-            Set_t previous_nodes{ *iter };
-            vector<int>  intermediates(iter->begin(), iter->end());
-            for (auto intermediate : intermediates)
-            {
-                previous_nodes.erase(intermediate);
-                double distance = edge_weights[0][intermediate] + paths[{intermediate, previous_nodes}];
-                if (distance < min_distance)
-                {
-                    min_distance = distance;
-                }
-                previous_nodes.insert(intermediate);
-            }
-            paths[p] = min_distance;
+            find_distance(paths, edge_weights, 0, *iter);
+            break;
         }
 
         for (int i = 1; i < num_edges_c; ++i)
         {
             // Skip this iteration if next node is in previous nodes
-            if (iter->find(i) != iter->end()) continue;
-
-            Path p = { i, *iter };
+            if (iter->find(i) != iter->end())
+                continue;
 
             if (iter->empty()) // Null set
             {
-                paths[p] = edge_weights[i][0];
+                // Path to i from starting vertex (0)
+                paths[{ i, *iter }] = edge_weights[i][0];
             }
             else
             {
-                double min_distance = numeric_limits<double>::infinity();
-                Set_t previous_nodes{ *iter };
-                vector<int>  intermediates(iter->begin(), iter->end());
-                for (auto intermediate : intermediates)
-                {
-                    previous_nodes.erase(intermediate);
-                    double distance = edge_weights[i][intermediate] + paths[{intermediate, previous_nodes}];
-                    if (distance < min_distance)
-                    {
-                        min_distance = distance;
-                    }
-                    previous_nodes.insert(intermediate);
-                }
-                paths[p] = min_distance;
+                find_distance(paths, edge_weights, i, *iter);
             }
-
         }
     }
 
-    for (auto iter1 = powerset.begin(); iter1 != powerset.end(); ++iter1)
-    {
-        for (auto iter2 = iter1->begin(); iter2 != iter1->end(); ++iter2)
-            cout << *iter2 << " ";
-        cout << endl;
-    }
+    cout << "TSP distance: " << paths[{0, *powerset.rbegin()}] << endl;
+    cout << "Power set:\n" << powerset;
 
     return 0;
 }
@@ -177,5 +148,32 @@ Power_Set_t generate_power_set(int n)
     return powerset;
 }
 
+void find_distance(Paths_container_t& paths, double edge_weights[][num_edges_c], int vertex_to, const Set_t& previous_verticies)
+{
+    double min_distance = numeric_limits<double>::infinity();
+    Set_t previous_nodes{ previous_verticies };
+    vector<int>  intermediates(previous_verticies.begin(), previous_verticies.end());
+    for (auto intermediate : intermediates)
+    {
+        previous_nodes.erase(intermediate);
+        double distance = edge_weights[vertex_to][intermediate] + paths[{intermediate, previous_nodes}];
+        if (distance < min_distance)
+        {
+            min_distance = distance;
+        }
+        previous_nodes.insert(intermediate);
+    }
+    paths[{ vertex_to, previous_verticies }] = min_distance;
+}
 
-void find_distance(int vertex_to, Set_t previous_verticies);
+ostream& operator << (ostream& os, const Power_Set_t& powerset)
+{
+    os << "null" << endl;
+    for (auto iter1 = ++powerset.begin(); iter1 != powerset.end(); ++iter1)
+    {
+        for (auto iter2 = iter1->begin(); iter2 != iter1->end(); ++iter2)
+            os << *iter2 << " ";
+        os << endl;
+    }
+    return os;
+}
