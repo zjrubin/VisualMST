@@ -1,4 +1,5 @@
 #include "getopt.h"
+#include "Held_Karp_TSP.h"
 #include "Kruskals_MST.h"
 #include "Prims_MST.h"
 #include "Utility.h"
@@ -15,7 +16,7 @@ using std::string;
 using std::unique_ptr; using std::make_unique;
 
 void run(const string& infile_name, const string& outfile_name, const string& algorithm);
-unique_ptr<MST> create_MST(ifstream& infile, const string& algorithm);
+unique_ptr<Graph> create_Graph(ifstream& infile, const string& algorithm);
 
 int main(int argc, char* argv[])
 {
@@ -88,7 +89,7 @@ void run(const string& infile_name, const string& outfile_name, const string& al
 	if (!infile.is_open())
 		throw Error{ "Could not open infile!" };
 
-	unique_ptr<MST> mst_ptr = create_MST(infile, algorithm);
+	unique_ptr<Graph> mst_ptr = create_Graph(infile, algorithm);
 
 	ofstream outfile{ outfile_name };
 	if (!outfile.is_open())
@@ -97,12 +98,14 @@ void run(const string& infile_name, const string& outfile_name, const string& al
 	mst_ptr->save(outfile);
 }
 
-unique_ptr<MST> create_MST(ifstream& infile, const string& algorithm)
+unique_ptr<Graph> create_Graph(ifstream& infile, const string& algorithm)
 {
 	if (algorithm == "prims")
 		return make_unique<Prims_MST>(infile);
 	else if (algorithm == "kruskals")
 		return make_unique<Kruskals_MST>(infile);
+	else if (algorithm == "held-karp")
+		return make_unique<Held_Karp_TSP>(infile);
 	else
 		throw Error{ "Invalid algorithm choice!\nValid options are: prims|kruskals" };
 }

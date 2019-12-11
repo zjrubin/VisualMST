@@ -1,27 +1,27 @@
-#ifndef MST_H
-#define MST_H
+#ifndef GRAPH_H
+#define GRAPH_H
 
 #include <iosfwd>
 #include <map>
 
-class MST
+class Graph
 {
 public:
-	virtual ~MST()
+	virtual ~Graph()
 	{}
 
 	/*
-	Outputs an MST in save-format:
+	Outputs an Graph in save-format:
 	- number of vertices
 	- coordinates for each vertex
 	- \n
-	- total_edge_weight of the MST
-	- connections between vertices that form an MST
+	- total_edge_weight of the Graph
+	- connections between vertices that form an Graph
 	*/
 	void save(std::ostream& os) const;
 
 protected:
-	MST(std::istream& is);
+	Graph(std::istream& is);
 
 	struct Vertex
 	{
@@ -41,4 +41,4 @@ protected:
 	double cartesian_distance(const Vertex& v1, const Vertex& v2) const;
 };
 
-#endif // !MST_H
+#endif // !GRAPH_H

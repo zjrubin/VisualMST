@@ -1,10 +1,9 @@
 #ifndef PRIMS_MST_H
 #define PRIMS_MST_H
 
-#include "MST.h"
-#include <map>
+#include "Graph.h"
 
-class Prims_MST final : public MST
+class Prims_MST final : public Graph
 {
 public:
 	Prims_MST(std::istream& is);

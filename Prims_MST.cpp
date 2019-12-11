@@ -19,7 +19,7 @@ struct Vertex_Attributes
 };
 
 Prims_MST::Prims_MST(istream& is)
-	: MST{is}
+	: Graph{is}
 {
 	// Create edge weight adjacency matrix
 	vector<vector<double>> edge_weights(verticies.size(), vector<double>(verticies.size(), numeric_limits<double>::infinity()));

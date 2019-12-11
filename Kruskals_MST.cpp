@@ -22,7 +22,7 @@ struct Edge
 };
 
 Kruskals_MST::Kruskals_MST(istream& is)
-	: MST{is}
+	: Graph{is}
 {
 	// Create a list of all possible edges
 	using Edge_t = Edge;

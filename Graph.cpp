@@ -1,10 +1,10 @@
-#include "MST.h"
+#include "Graph.h"
 #include <cmath>
 #include <iostream>
 
 using std::endl;
 
-MST::MST(std::istream& is)
+Graph::Graph(std::istream& is)
 	: total_edge_weight{ 0 }
 {
 	// Read in verticies
@@ -16,7 +16,7 @@ MST::MST(std::istream& is)
 	}
 }
 
-void MST::save(std::ostream& os) const
+void Graph::save(std::ostream& os) const
 {
 	os << verticies.size() << endl;
 	for (const auto& pair : verticies)
@@ -30,7 +30,7 @@ void MST::save(std::ostream& os) const
 		os << iter->first << " " << iter->second << endl;
 }
 
-double MST::cartesian_distance(const Vertex& v1, const Vertex& v2) const
+double Graph::cartesian_distance(const Vertex& v1, const Vertex& v2) const
 {
 	return sqrt(pow(v2.x - v1.x, 2) + pow(v2.y - v1.y, 2) + pow(v2.z- v1.z, 2));
 }

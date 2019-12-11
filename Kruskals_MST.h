@@ -1,10 +1,9 @@
 #ifndef KRUSKALS_MST_H
 #define KRUSKALS_MST_H
 
-#include "MST.h"
-#include <map>
+#include "Graph.h"
 
-class Kruskals_MST final : public MST
+class Kruskals_MST final : public Graph
 {
 public:
 	Kruskals_MST(std::istream& is);
