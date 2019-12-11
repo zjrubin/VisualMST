@@ -21,19 +21,7 @@ struct Vertex_Attributes
 Prims_MST::Prims_MST(istream& is)
 	: Graph{is}
 {
-	// Create edge weight adjacency matrix
-	vector<vector<double>> edge_weights(verticies.size(), vector<double>(verticies.size(), numeric_limits<double>::infinity()));
-	for (size_t i = 0; i < verticies.size(); ++i)
-	{
-		for (size_t j = 0; j < verticies.size(); ++j)
-		{
-			// Disallow self-edges
-			if (i == j)
-				continue;
-
-			edge_weights[i][j] = cartesian_distance(verticies[i], verticies[j]);
-		}
-	}
+	Adjacency_matrix_t edge_weights = create_adjacency_matrix();
 
 	map<int, Vertex_Attributes> costs; // Map from: vertex number -> {cost, previous vertex}s
 	for (size_t i = 0; i < verticies.size(); ++i)

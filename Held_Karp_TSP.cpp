@@ -62,28 +62,14 @@ struct Comp_Path
 
 using Paths_container_t = map<Path, double, Comp_Path>;
 
-using Weights_container_t = vector<vector<double>>;
-
 Power_Set_t generate_power_set(int n);
-void find_distance(Paths_container_t& paths, const Weights_container_t& edge_weights, int vertex_to, const Set_t& previous_verticies);
+void find_distance(Paths_container_t& paths, const Graph::Adjacency_matrix_t& edge_weights, int vertex_to, const Set_t& previous_verticies);
 ostream& operator << (ostream& os, const Power_Set_t& powerset);
 
 Held_Karp_TSP::Held_Karp_TSP(istream& is)
     : Graph{ is }
 {
-    // Create edge weight adjacency matrix
-    Weights_container_t edge_weights(verticies.size(), vector<double>(verticies.size(), numeric_limits<double>::infinity()));
-    for (size_t i = 0; i < verticies.size(); ++i)
-    {
-        for (size_t j = 0; j < verticies.size(); ++j)
-        {
-            // Disallow self-edges
-            if (i == j)
-                continue;
-
-            edge_weights[i][j] = cartesian_distance(verticies[i], verticies[j]);
-        }
-    }
+    Adjacency_matrix_t edge_weights = create_adjacency_matrix();
 
     Paths_container_t paths;
     Power_Set_t powerset = generate_power_set(verticies.size() - 1);
@@ -98,7 +84,7 @@ Held_Karp_TSP::Held_Karp_TSP(istream& is)
             break;
         }
 
-        for (int i = 1; i < verticies.size(); ++i)
+        for (int i = 1; i < static_cast<int>(verticies.size()); ++i)
         {
             // Skip this iteration if next node is in previous nodes
             if (iter->find(i) != iter->end())
@@ -152,7 +138,7 @@ Power_Set_t generate_power_set(int n)
     return powerset;
 }
 
-void find_distance(Paths_container_t& paths, const Weights_container_t& edge_weights, int vertex_to, const Set_t& previous_verticies)
+void find_distance(Paths_container_t& paths, const Graph::Adjacency_matrix_t& edge_weights, int vertex_to, const Set_t& previous_verticies)
 {
     double min_distance = numeric_limits<double>::infinity();
     Set_t previous_nodes{ previous_verticies };
