@@ -63,7 +63,7 @@ struct Comp_Path
 using Paths_container_t = map<Path, double, Comp_Path>;
 
 Power_Set_t generate_power_set(int n);
-void find_distance(Paths_container_t& paths, const Graph::Adjacency_matrix_t& edge_weights, int vertex_to, const Set_t& previous_verticies);
+int find_distance(Paths_container_t& paths, const Graph::Adjacency_matrix_t& edge_weights, int vertex_to, const Set_t& previous_verticies);
 ostream& operator << (ostream& os, const Power_Set_t& powerset);
 
 Held_Karp_TSP::Held_Karp_TSP(istream& is)
@@ -80,7 +80,7 @@ Held_Karp_TSP::Held_Karp_TSP(istream& is)
         // calculate distance back to starting vertex
         if (iter->size() == verticies.size() - 1)
         {
-            find_distance(paths, edge_weights, 0, *iter);
+            int previous_vertex = find_distance(paths, edge_weights, 0, *iter);
             break;
         }
 
@@ -97,12 +97,29 @@ Held_Karp_TSP::Held_Karp_TSP(istream& is)
             }
             else
             {
-                find_distance(paths, edge_weights, i, *iter);
+                int previous_vertex = find_distance(paths, edge_weights, i, *iter);
+                //edges.insert({ previous_vertex, i });
             }
         }
     }
 
-    cout << "TSP distance: " << paths[{0, * powerset.rbegin()}] << endl;
+    // Retrace the path
+    {   
+        Set_t chosen_path = *powerset.rbegin();
+        int next_vertex = 0;
+        for (int i = 0; i < static_cast<int>(verticies.size()) - 1; ++i)
+        {
+           
+            int previous_vertex = find_distance(paths, edge_weights, next_vertex, chosen_path);
+            edges.insert({ previous_vertex, next_vertex });
+            chosen_path.erase(previous_vertex);
+            next_vertex = previous_vertex;
+        }
+        edges.insert({ 0, next_vertex });
+    }
+
+    total_edge_weight = paths[{0, * powerset.rbegin()}];
+    cout << "TSP distance: " << paths[{0, *powerset.rbegin()}] << endl;
     cout << "Power set:\n" << powerset;
 }
 
@@ -138,11 +155,12 @@ Power_Set_t generate_power_set(int n)
     return powerset;
 }
 
-void find_distance(Paths_container_t& paths, const Graph::Adjacency_matrix_t& edge_weights, int vertex_to, const Set_t& previous_verticies)
+int find_distance(Paths_container_t& paths, const Graph::Adjacency_matrix_t& edge_weights, int vertex_to, const Set_t& previous_verticies)
 {
     double min_distance = numeric_limits<double>::infinity();
     Set_t previous_nodes{ previous_verticies };
     vector<int>  intermediates(previous_verticies.begin(), previous_verticies.end());
+    int previous_vertex;
     for (auto intermediate : intermediates)
     {
         previous_nodes.erase(intermediate);
@@ -150,10 +168,12 @@ void find_distance(Paths_container_t& paths, const Graph::Adjacency_matrix_t& ed
         if (distance < min_distance)
         {
             min_distance = distance;
+            previous_vertex = intermediate;
         }
         previous_nodes.insert(intermediate);
     }
     paths[{ vertex_to, previous_verticies }] = min_distance;
+    return previous_vertex;
 }
 
 ostream& operator << (ostream& os, const Power_Set_t& powerset)
