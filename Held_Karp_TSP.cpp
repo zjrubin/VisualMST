@@ -1,125 +1,69 @@
 #include "Held_Karp_TSP.h"
 #include <cassert>
-#include <iostream>
 #include <limits>
-#include <map>
-#include <numeric>
-#include <set>
-#include <vector>
 
-using namespace std;
+using std::istream;
+using std::numeric_limits;
+using std::set;
+using std::vector;
 
-using Set_t = set<int>;
 template<typename T>
-struct Set_Comp
+bool Held_Karp_TSP::Set_Comp<T>::operator() (const set<T>& lhs, const set<T>& rhs) const
 {
-    using is_transparent = std::true_type;
-    bool operator() (const set<T>& lhs, const set<T>& rhs) const
+    if (lhs.size() != rhs.size())
+        return lhs.size() < rhs.size();
+
+    for (auto iter1 = lhs.begin(), iter2 = rhs.begin(); iter1 != lhs.end(); ++iter1, ++iter2)
     {
-        if (lhs.size() != rhs.size())
-            return lhs.size() < rhs.size();
-
-        for (auto iter1 = lhs.begin(), iter2 = rhs.begin(); iter1 != lhs.end(); ++iter1, ++iter2)
-        {
-            if (*iter1 != *iter2)
-                return *iter1 < *iter2;
-        }
-
-        assert(!"This point shold not be reached");
-        return false;
+        if (*iter1 != *iter2)
+            return *iter1 < *iter2;
     }
-};
-using Power_Set_t = set<Set_t, Set_Comp<int>>;
 
-struct Path
-{
-    int vertex_to;
-    Set_t previous_vertices;
-};
+    assert(!"This point shold not be reached");
+    return false;
+}
 
-struct Comp_Path
+
+bool Held_Karp_TSP::Comp_Path::operator() (const Path& lhs, const Path& rhs) const
 {
-    using is_transparent = std::true_type;
-    bool operator() (const Path& lhs, const Path& rhs) const
+    if (lhs.previous_vertices.size() != rhs.previous_vertices.size())
+        return lhs.previous_vertices.size() < rhs.previous_vertices.size();
+
+    if (lhs.vertex_to != rhs.vertex_to)
+        return lhs.vertex_to < rhs.vertex_to;
+
+    auto& lprev = lhs.previous_vertices;
+    auto& rprev = rhs.previous_vertices;
+    for (auto iter1 = lprev.begin(), iter2 = rprev.begin(); iter1 != lprev.end(); ++iter1, ++iter2)
     {
-        if (lhs.previous_vertices.size() != rhs.previous_vertices.size())
-            return lhs.previous_vertices.size() < rhs.previous_vertices.size();
-
-        if (lhs.vertex_to != rhs.vertex_to)
-            return lhs.vertex_to < rhs.vertex_to;
-
-        auto& lprev = lhs.previous_vertices;
-        auto& rprev = rhs.previous_vertices;
-        for (auto iter1 = lprev.begin(), iter2 = rprev.begin(); iter1 != lprev.end(); ++iter1, ++iter2)
-        {
-            if (*iter1 != *iter2)
-                return *iter1 < *iter2;
-        }
-
-        return false; // lhs !< rhs
+        if (*iter1 != *iter2)
+            return *iter1 < *iter2;
     }
-};
 
-using Paths_container_t = map<Path, double, Comp_Path>;
+    return false; // lhs !< rhs
+}
 
-Power_Set_t generate_power_set(int n);
-int find_distance(Paths_container_t& paths, const Graph::Adjacency_matrix_t& edge_weights, int vertex_to, const Set_t& previous_verticies);
 
 Held_Karp_TSP::Held_Karp_TSP(istream& is)
     : Graph{ is }
 {
     Adjacency_matrix_t edge_weights = create_adjacency_matrix();
 
-    Paths_container_t paths;
+    // Create every possible subset of verticies in the graph, excluding vertex 0
     Power_Set_t powerset = generate_power_set(verticies.size() - 1);
 
-    // Iterate from the null set through every subset, but exclude the full set itself
-    for (auto iter = powerset.begin(); iter != powerset.end(); ++iter)
-    {
-        // calculate distance back to starting vertex
-        if (iter->size() == verticies.size() - 1)
-        {
-            find_distance(paths, edge_weights, 0, *iter);
-            break;
-        }
+    // Apply the Held-Karp algorithm
+    Paths_container_t paths = generate_paths(edge_weights, powerset);
+    
+    // Sum of all the edge weights is stored in [0, {all other verticies}]
+    total_edge_weight = paths[{0, *powerset.rbegin()}];
 
-        for (int i = 1; i < static_cast<int>(verticies.size()); ++i)
-        {
-            // Skip this iteration if next node is in previous nodes
-            if (iter->find(i) != iter->end())
-                continue;
-
-            if (iter->empty()) // Null set
-            {
-                // Path to i from starting vertex (0)
-                paths[{ i, * iter }] = edge_weights[i][0];
-            }
-            else
-            {
-                find_distance(paths, edge_weights, i, *iter);
-            }
-        }
-    }
-
-    // Retrace the path
-    {   
-        Set_t chosen_path = *powerset.rbegin();
-        int next_vertex = 0;
-        for (int i = 0; i < static_cast<int>(verticies.size()) - 1; ++i)
-        {
-           
-            int previous_vertex = find_distance(paths, edge_weights, next_vertex, chosen_path);
-            edges.insert({ previous_vertex, next_vertex });
-            chosen_path.erase(previous_vertex);
-            next_vertex = previous_vertex;
-        }
-        edges.insert({ 0, next_vertex });
-    }
-
-    total_edge_weight = paths[{0, * powerset.rbegin()}];
+    // Find all the edges used to complete the TSP
+    trace_path(paths, edge_weights, *powerset.rbegin());
 }
 
-Power_Set_t generate_power_set(int n)
+
+Held_Karp_TSP::Power_Set_t Held_Karp_TSP::generate_power_set(int n)
 {
     Power_Set_t powerset;
     vector<int> stack(n + 1, 0);
@@ -151,7 +95,59 @@ Power_Set_t generate_power_set(int n)
     return powerset;
 }
 
-int find_distance(Paths_container_t& paths, const Graph::Adjacency_matrix_t& edge_weights, int vertex_to, const Set_t& previous_verticies)
+
+Held_Karp_TSP::Paths_container_t Held_Karp_TSP::generate_paths(const Adjacency_matrix_t& edge_weights, const Power_Set_t& powerset)
+{
+    Paths_container_t paths;
+    // Iterate from the null set through every subset, but exclude the full set itself
+    for (auto iter = powerset.begin(); iter != powerset.end(); ++iter)
+    {
+        // calculate distance back to starting vertex
+        if (iter->size() == verticies.size() - 1)
+        {
+            find_distance(paths, edge_weights, 0, *iter);
+            break;
+        }
+
+        for (int i = 1; i < static_cast<int>(verticies.size()); ++i)
+        {
+            // Skip this iteration if next node is in previous nodes
+            if (iter->find(i) != iter->end())
+                continue;
+
+            if (iter->empty()) // Null set
+            {
+                // Path to i from starting vertex (0)
+                paths[{ i, * iter }] = edge_weights[i][0];
+            }
+            else
+            {
+                find_distance(paths, edge_weights, i, *iter);
+            }
+        }
+    }
+
+    return paths;
+}
+
+
+void Held_Karp_TSP::trace_path(Paths_container_t& paths, const Adjacency_matrix_t& edge_weights, Set_t final_path)
+{
+    int next_vertex = 0;
+    for (int i = 0; i < static_cast<int>(verticies.size()) - 1; ++i)
+    {
+
+        int previous_vertex = find_distance(paths, edge_weights, next_vertex, final_path);
+        edges.insert({ previous_vertex, next_vertex });
+        final_path.erase(previous_vertex);
+        next_vertex = previous_vertex;
+    }
+    edges.insert({ 0, next_vertex });
+}
+
+
+int Held_Karp_TSP::find_distance(Paths_container_t& paths, const Adjacency_matrix_t& edge_weights,
+    int vertex_to, const Set_t& previous_verticies)
 {
     double min_distance = numeric_limits<double>::infinity();
     Set_t previous_nodes{ previous_verticies };
