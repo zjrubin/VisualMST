@@ -54,13 +54,13 @@ int main(int argc, char* argv[])
 				break;
 			case 'h':
 			default:
-				throw Error{ "Usage: " + string{argv[0]} + " -m <prims|kruskals> -i <infile> -o <outfile>" };
+				throw Error{ "Usage: " + string{argv[0]} + " -m <prims|kruskals|held-karp> -i <infile> -o <outfile>" };
 				break;
 			}
 		}
 
 		if (!i_seen || !o_seen || !m_seen) // Make sure all required options have been seen
-			throw Error{ "Usage: " + string{argv[0]} + " -m <prims|kruskals> -i <infile> -o <outfile>" };
+			throw Error{ "Usage: " + string{argv[0]} + " -m <prims|kruskals|held-karp> -i <infile> -o <outfile>" };
 
 		run(infile, outfile, algorithm);
 	}
@@ -107,5 +107,5 @@ unique_ptr<Graph> create_Graph(ifstream& infile, const string& algorithm)
 	else if (algorithm == "held-karp")
 		return make_unique<Held_Karp_TSP>(infile);
 	else
-		throw Error{ "Invalid algorithm choice!\nValid options are: prims|kruskals" };
+		throw Error{ "Invalid algorithm choice!\nValid options are: prims|kruskals|held-karp" };
 }
